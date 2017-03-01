@@ -1,15 +1,23 @@
 <?php
     require('vendor/autoload.php');
+    require './generated-conf/config.php';
+    require "./public/service/imgService.php";
 
 $app = new \Slim\Slim();
     $app->get('/hello',function(){
         echo "hello";
     });
     $app->post('/upload',function() use ($app){
+//       $name = $_POST['name'];
+       $headers = apache_request_headers();
+//       echo "$name";
+//       $file = $_FILES['fileToUpload'];
+
        $target_dir = "public/uploads/";
-        $uploadOk =1;
-       $file = $_FILES['fileToUpload'];
-    
+       $uploadOk =1;
+        $file = $_FILES["fileToUpload"];
+
+
         $target_file = $target_dir.basename($_FILES['fileToUpload']['name']);
         $imageFileType =strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 
@@ -25,13 +33,14 @@ $app = new \Slim\Slim();
             echo "sorry, your file was not uploaded";
         }else{
             if(move_uploaded_file($_FILES["fileToUpload"]["tmp_name"],$target_file)){
+                createImage($target_file);
                 echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
             }else{
                 echo "Sorry, there was an error uploading your file.";
             }
         }
-        var_dump($file);
-        echo "hello";
+//        var_dump($file);
+//        echo "hello";
 //        print_r($files);
     });
 

@@ -1,14 +1,63 @@
 <!DOCTYPE html>
 <html>
     <head>
-        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.4.2/angular-ui-router.min.js"></script>
+
     </head>
     
-    <body>
-        <form action="upload" method="post" enctype="multipart/form-data">
+    <body ng-app="myApp" ng-controller="defaultCtrl">
+        <form>
+            {{name}}
             Select image to upload:
-            <input type = "file" name="fileToUpload" id="fileToUpload">
-            <input type="submit" value="Upload Image" name="submit">
+            <input type = "file" name="fileToUpload" id="fileToUpload" ng-model="file" file-input="inputData.name">
+            {{file}}
+            <input type="text" name="name" ng-model="name" />
+            
+            {{name}}
+            <button ng-click="submit()">submit</button>
         </form>
+        <script>
+            angular.module('myApp',[]).controller('defaultCtrl', defaultCtrl).directive('fileInput', ['$parse', function ($parse) {
+                return {
+                    restrict: 'A',
+                    link: function (scope, element, attributes) {
+                        element.bind('change', function () {
+                            $parse(attributes.fileInput)
+                                .assign(scope,element[0].files)
+                            scope.$apply()
+                        });
+                    }
+                };
+            }]);
+            function defaultCtrl($scope,$http){
+                $scope.inputData = {};
+
+                $scope.name = "luyuan";
+                var formData = new FormData();
+                $scope.submit = function () {
+                    formData.append('fileToUpload',$scope.inputData.name[0]);
+
+                    console.log($scope.inputData.name[0]);
+//                    formData.append('name','luis');
+                    $http({
+                        data:formData,
+                        method:'POST',
+                        url:'router.php/upload',
+                        headers:{
+                            'Content-Type': undefined,
+                            'Process-Data': false
+                        }
+                    }).then(function (success){
+                        console.log(success);
+                    },function(err){
+                        console.log(err);
+                    });
+                }
+            }
+
+        </script>
     </body>
 </html>
